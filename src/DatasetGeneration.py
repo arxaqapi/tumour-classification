@@ -159,7 +159,7 @@ class TMADataset:
   
   def set_all_spectrums(self, overwrite: bool = True):
     """
-    Pour chaque sample, leurs spectres sont récupérées
+    Pour chaque sample, les spectres conrrespondant sont récupérées
     """
     # NOTE: too much data in cache 
     print('Get spectrums of all samples')
