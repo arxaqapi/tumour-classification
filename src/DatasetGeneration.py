@@ -1,3 +1,4 @@
+from collections import namedtuple
 import numpy as np
 from pathlib import Path
 
@@ -5,6 +6,9 @@ import cv2
 import pickle
 from pyimzml.ImzMLParser import ImzMLParser
 from sklearn.model_selection import train_test_split
+
+
+Position = namedtuple('Position', ['x', 'y'])
 
 
 class TissueSample():
@@ -84,6 +88,10 @@ class TMADataset:
     return valid_coordinates
 
   def bounding_boxes_of_tissue_samples(self):
+    """
+    Récupère les boites encadrantes pour chaque échantillon de tissue
+    et les ajoutes a la liste self.tissue_samples
+    """
     # (416, 311)
     assert self.valid_coordinates.shape == (416, 311)
     gray_image = self.valid_coordinates.astype(dtype=np.uint8) 
@@ -134,6 +142,7 @@ class TMADataset:
   def set_spectrums_of_tissue(self, sample: TissueSample):
     """
     Récupère chaque spectre de chaque point de relevé valide du tissue
+    bounding_boxes_of_tissue_samples() doit avoir été lancée une fois avant
     """
     intensities = []
     for x in range(sample.x1, sample.x2):
@@ -166,15 +175,47 @@ class TMADataset:
         pickle.dump(self.tissue_samples, temp_f)
 
   def manually_assign_labels(self):
+    # {(x:, y:) : label}
+    pos_to_label = {
+      # H: 1 -> 11
+      Position(28, 297) : '',
+      Position(64, 297) : '',
+      Position(99, 297) : 'cc',
+      Position(133, 291) : 'cc',
+      Position(166, 291) : 'cc',
+      Position(205, 291) : 'chc',
+      Position(235, 280) : 'chc',
+      Position(270, 280) : 'chc',
+      Position(305, 280) : 'chc',
+      Position(340, 275) : 'cc',
+      Position(374, 280) : 'cc',
+      # G: 1 -> 12
+      Position(27, 258) : 'chc',
+      Position(62, 258) : 'chc',
+      Position(96, 254) : 'chc',
+      Position(130, 254) : 'chc',
+      Position(163, 250) : 'cc',
+      Position(200, 246) : 'cc',
+      Position(233, 240) : 'cc',
+      Position(268, 240) : 'cc',
+      Position(302, 238) : 'chc',
+      Position(337, 235) : '',
+      Position(369, 232) : '',
+      Position(406, 230) : '',
+    }
+    def _point_in_rec(pos: Position, x1, y1, x2, y2):
+      if pos.x > x1 and pos.x < x2 and pos.y > y1 and pos.y < y2:
+        return True 
+      return False
     # (416, 311)
     for sample in self.tissue_samples:
-      # if sample.x1 > 5 and sample.x1 < 40 and sample.y1 > 250 and 
-      # print(sample)
-      if sample.y2 >= 308:
-        print(sample)
-        self.test_image[sample.x1:sample.x2+1, sample.y1:sample.y2+1] = 255   
-        cv2.imwrite("hm.png", self.test_image)
-        exit(1)
+       # NOTE: pour chaque valeur de pos_to_label
+       # si point dans carré du sample, alors j'assigne label
+      for pos, label in pos_to_label.items():
+        if _point_in_rec(pos, x1=sample.x1, y1=sample.y1, x2=sample.x2, y2=sample.y2):
+          sample.label = label
+          # self.test_image[sample.x1+1:sample.x2, sample.y1+1:sample.y2] = 255   
+          # cv2.imwrite("hm.png", self.test_image)
   
   def data_generator(self):
     for sample in self.tissue_samples:
@@ -203,10 +244,4 @@ class TMADataset:
       with open(dataset_path, 'wb') as data_pkl_f:
         pickle.dump((X_train, X_test, y_train, y_test), data_pkl_f)
       return X_train, X_test, y_train, y_test
-
-
-# def show_im(p, mz_value=2400):
-#   im = getionimage(p, mz_value)
-#   plt.imshow(im, cmap='viridis', interpolation ='nearest')
-#   plt.show()
 
