@@ -24,14 +24,16 @@ if __name__ == '__main__':
 
   dataset = TMADataset()
   dataset.bounding_boxes_of_tissue_samples()
-  dataset.set_all_spectrums()
+  dataset.manually_assign_labels()
+  dataset.set_all_spectrums(overwrite=False)
 
-  # arr = dataset.set_spectrums_of_tissue(dataset.tissue_samples[0])
-  # dataset.manually_assign_labels()
+  X_train, X_test, y_train, y_test = dataset.get_train_test_data(
+    overwrite=False
+  )
 
-
-  X_train, X_test, y_train, y_test = dataset.get_train_test_data()
-  # X_train, X_test, y_train, y_test = np.ones((10, 32320)), np.ones((10, 32320)), None, None
+  print(X_train.shape)
+  print(X_test.shape)
+  print(y_train[:10])
 
   # train_ae(X_train, X_test, y_train, y_test)
   train_convae(

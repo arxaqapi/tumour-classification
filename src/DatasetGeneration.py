@@ -139,7 +139,7 @@ class TMADataset:
         return i
     return -1
 
-  def set_spectrums_of_tissue(self, sample: TissueSample):
+  def _set_spectrums_of_tissue(self, sample: TissueSample):
     """
     Récupère chaque spectre de chaque point de relevé valide du tissue
     bounding_boxes_of_tissue_samples() doit avoir été lancée une fois avant
@@ -164,13 +164,15 @@ class TMADataset:
     # NOTE: too much data in cache 
     print('Get spectrums of all samples')
     temp_path = Path('../data/temp.pkl')
+    if overwrite and temp_path.exists():
+      temp_path.unlink()
 
     if temp_path.exists():
       with open(temp_path, 'rb') as temp_f:
         self.tissue_samples = pickle.load(temp_f)
     else:
       for sample in self.tissue_samples:
-        self.set_spectrums_of_tissue(sample)
+        self._set_spectrums_of_tissue(sample)
       with open(temp_path, 'wb') as temp_f:
         pickle.dump(self.tissue_samples, temp_f)
 
@@ -213,17 +215,19 @@ class TMADataset:
        # si point dans carré du sample, alors j'assigne label
       for pos, label in pos_to_label.items():
         if _point_in_rec(pos, x1=sample.x1, y1=sample.y1, x2=sample.x2, y2=sample.y2):
-          sample.label = label
-          # self.test_image[sample.x1+1:sample.x2, sample.y1+1:sample.y2] = 255   
-          # cv2.imwrite("hm.png", self.test_image)
+          sample.set_label(label)
+          self.test_image[sample.x1+1:sample.x2, sample.y1+1:sample.y2] = 255   
+    cv2.imwrite("label_assigned_samples.png", self.test_image)
   
   def data_generator(self):
     for sample in self.tissue_samples:
       for point in sample.values:
         yield point, sample.label
 
-  def get_train_test_data(self):
+  def get_train_test_data(self, only_labeled: bool = True, overwrite = True):
     dataset_path = Path('../data/dataset_extracted_20200729_tma_ctrl_cc-chc_sans_normalisation.pkl')
+    if overwrite and dataset_path.exists():
+      dataset_path.unlink()
 
     if dataset_path.exists():
       print('loading dataset')
@@ -236,9 +240,15 @@ class TMADataset:
       X_ = []
       y_ = []
       for x, y in self.data_generator():
-        X_.append(x)
-        y_.append(y)
-      # print(np.array(X_).shape)
+        if only_labeled:
+          if y in ['cc', 'chc']: # ajout uniquemenet si label non null
+            X_.append(x)
+            y_.append(y)
+        else:
+          X_.append(x)
+          y_.append(y)
+      assert len(X_) > 0
+      assert len(y_) > 0
       X_train, X_test, y_train, y_test = train_test_split(X_, y_, test_size=0.2)
       X_train, X_test, y_train, y_test = np.array(X_train), np.array(X_test), np.array(y_train), np.array(y_test)
       with open(dataset_path, 'wb') as data_pkl_f:
