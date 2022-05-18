@@ -204,6 +204,18 @@ class TMADataset:
       Position(337, 235) : '',
       Position(369, 232) : '',
       Position(406, 230) : '',
+      # F: 1 -> 10
+      Position(22, 224) : 'cc',
+      Position(57, 221) : 'cc',
+      Position(92, 216) : 'cc',
+      Position(128, 216) : 'chc',
+      Position(162, 211) : 'chc',
+      Position(196, 211) : 'chc',
+      Position(230, 206) : 'cc',
+      Position(265, 202) : 'cc',
+      Position(300, 197) : 'cc',
+      Position(336, 197) : 'cc',
+
     }
     def _point_in_rec(pos: Position, x1, y1, x2, y2):
       if pos.x > x1 and pos.x < x2 and pos.y > y1 and pos.y < y2:
