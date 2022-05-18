@@ -215,7 +215,55 @@ class TMADataset:
       Position(265, 202) : 'cc',
       Position(300, 197) : 'cc',
       Position(336, 197) : 'cc',
-
+      # E: /
+      # D: 1 -> 12
+      Position(17, 150) : 'cc',
+      Position(51, 147) : 'cc',
+      Position(86, 143) : 'cc',
+      Position(120, 140) : 'chc',
+      Position(155, 137) : 'chc',
+      Position(190, 135) : 'chc',
+      Position(226, 131) : 'chc',
+      Position(260, 130) : '',
+      Position(296, 127) : 'cc',
+      Position(329, 122) : 'cc',
+      Position(365, 121) : 'cc',
+      Position(405, 120) : 'cc',
+      # C: 1 -> 11
+      Position(16, 113) : 'chc',
+      Position(48, 108) : 'chc',
+      Position(83, 105) : 'cc',
+      Position(118, 104) : 'cc',
+      Position(152, 100) : 'cc',
+      Position(188, 97) : 'cc',
+      Position(215, 95) : 'chc',
+      Position(257, 92) : 'chc',
+      Position(295, 88) : 'chc',
+      Position(329, 88) : 'chc',
+      Position(364, 85) : 'chc',
+      # B: 1 -> 9 \ {2}
+      Position(12, 78) : 'chc',
+      # missing (47, 74)
+      Position(81, 70) : 'chc',
+      Position(113, 67) : 'chc',
+      Position(151, 62) : 'cc',
+      Position(183, 60) : 'cc',
+      Position(221, 55) : 'cc',
+      Position(248, 53) : 'cc',
+      Position(290, 48) : 'chc',
+      Position(324, 47) : 'chc',
+      # A: 1 -> 11 \ {5}
+      Position(10, 38) : '',
+      Position(42, 32) : 'cc',
+      Position(78, 31) : 'cc',
+      Position(111, 29) : 'cc',
+      Position(148, 24) : '', # cc, box colision to handle
+      Position(181, 20) : 'chc',
+      Position(216, 18) : 'chc',
+      Position(250, 16) : 'chc',
+      Position(287, 11) : 'chc',
+      Position(321, 10) : 'cc',
+      Position(356, 10) : 'cc',
     }
     def _point_in_rec(pos: Position, x1, y1, x2, y2):
       if pos.x > x1 and pos.x < x2 and pos.y > y1 and pos.y < y2:
