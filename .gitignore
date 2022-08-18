@@ -3,6 +3,7 @@ data/*
 doc/
 src/*.png
 src/models
+img/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
